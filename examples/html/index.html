@@ -1,0 +1,194 @@
+<html>
+
+<head>
+    <!-- <script src="/node_modules/tweakpane/dist/tweakpane.js" type="module"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.0/dist/tweakpane.min.js"></script>
+    <script src="../../node_modules/@tweakpane/plugin-essentials/dist/tweakpane-plugin-essentials.min.js"
+        type="module"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/@tormak/tweakpane-plugin-gradient@1.7.0/dist/tormak-tweakpane-plugin-gradient.min.js"></script>
+    <script src="/dist/@youwol/tweakpane.js" type="module"></script>
+
+    <script src="../../libs/plotly.min.js"></script>
+    <script src="../../libs/tormak-tweakpane-plugin-gradient.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <script>
+        function generateRandomDomain(n) {
+            const r = []
+            const d = 8
+            for (let i = 0.; i < n; ++i) {
+                const x = i / n * d
+                for (let j = 0.; j < n; ++j) {
+                    const y = j / n * d
+                    r.push(Math.sin(x) * Math.cos(y) ** 2)
+                }
+            }
+            return {
+                values: r,
+                width: n,
+                height: n
+            }
+        }
+
+        function domain2({ div, width, data }) {
+            const n = data.width
+            const m = data.height
+
+            var size = n, x = new Array(size), y = new Array(size), z = new Array(size), i, j
+
+            for (var i = 0; i < size; i++) {
+                x[i] = y[i] = i / (n - 1)
+                z[i] = new Array(size)
+            }
+
+            let k = 0
+            for (var i = 0; i < size; i++) {
+                for (j = 0; j < size; j++) {
+                    z[i][j] = data.values[k++]
+                }
+            }
+
+            var data = [{
+                z: z,
+                x: x,
+                y: y,
+                type: 'contour',
+                colorbar: {
+                    thickness: 30,
+                    title: 'Cost',
+                    titleside: 'right',
+                    titlefont: {
+                        size: 14,
+                        family: 'Arial, sans-serif'
+                    }
+                }
+            }
+            ];
+
+            Plotly.newPlot(div, data, {
+                title: 'coucou',
+                autosize: false,
+                width: 500,
+                height: 500,
+                xaxis: {
+                    title: {
+                        text: 'R',
+                        font: {
+                            family: 'Courier New, monospace',
+                            size: 18,
+                            color: '#7f7f7f'
+                        }
+                    },
+                },
+                yaxis: {
+                    title: {
+                        text: 'Theta',
+                        font: {
+                            family: 'Courier New, monospace',
+                            size: 18,
+                            color: '#7f7f7f'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+    <script>
+        function openNav() {
+            const w = 300
+            document.getElementById("mySidenav").style.width = `${w}px`
+            document.getElementById("main").style.marginLeft = `${w}px`
+            document.getElementById("mainMenu").style.opacity = 0
+        }
+
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0px"
+            document.getElementById("main").style.marginLeft = "0px"
+            document.getElementById("mainMenu").style.opacity = 1
+        }
+    </script>
+
+    <!-- See https://www.w3schools.com/howto/howto_js_sidenav.asp -->
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <!-- <a href="#">Load</a>
+        <a href="#">Clear</a>
+        <a href="#">Run</a> -->
+        <div class="col-sm-6" id="gui1" style="margin: 5px; opacity: 100%; min-width: 95%;"></div>
+        <div class="col-sm-6" id="gui2" style="margin: 5px; opacity: 100%; min-width: 95%;"></div>
+    </div>
+
+    <div id="main">
+        <span style="font-size:30px;cursor:pointer" onclick="openNav()" id="mainMenu">&#9776;</span>
+        <div class="container">
+            <div class="row align-items-start">
+                <div class="col">
+                    <div class="col">
+                        <div class="container" id="consol"
+                            style="left:0%; border: 2px solid #000000; padding-bottom: 10px; border-radius: 5px;margin-top: 10px">
+                            <center>
+                                <p id="title"><strong></strong></p>
+                            </center>
+                        </div>
+
+                    </div>
+                    <div class="col">
+                        <center>
+                            <div id="domainDiv" style="margin-top: 5px;">
+                            </div>
+                        </center>
+                    </div>
+                    <div class="col">
+                        <center><canvas id="scatterDiv" style="margin-top: 5px; min-height: 100px;"></canvas>
+                        </center>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        const gui = window['@youwol/tweakpane']
+
+        // ESC key for the navbar
+        $(document).keyup(e => {
+            if (e.keyCode === 27) {
+                const w = document.getElementById("mySidenav").style.width
+                if (w === '0px') {
+                    openNav()
+                }
+                else {
+                    closeNav()
+                }
+            }
+        })
+
+        domain2({
+            div: 'domainDiv',
+            width: 400,
+            data: generateRandomDomain(50)
+        })
+
+        gui.testGui1('gui1')
+        gui.testGui2('gui2')
+
+    </script>
+</body>
+
+</html>
